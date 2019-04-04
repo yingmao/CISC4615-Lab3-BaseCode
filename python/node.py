@@ -66,7 +66,7 @@ t.start()
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 while True:
-    print("Input command(FirstLoad,Send,Bye, or MyRoutingTable):")
+    print("Input command(FirstLoad, FirstSend, Bye, or MyRoutingTable):")
     text = sys.stdin.readline().strip()
     if text == "FirstSend":
         #send to link1
