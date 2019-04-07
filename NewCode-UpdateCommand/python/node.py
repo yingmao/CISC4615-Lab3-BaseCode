@@ -11,19 +11,30 @@ import configparser
 def is_diff(obj1,obj2):
     if obj1 == None or obj2 == None:
         return False
-    str1 = json.dumps(obj1)
-    str2 = json.dumps(obj2)
-    return str1 != str2
+    for k in obj1:
+        if k == 'node':
+            continue
+        if obj1[k]['cost'] != obj2[k]['cost']:
+            return True
+    return False
 
 def print_table(obj):
     if obj == None:
         print(">>>>>> table is empty <<<<<<<<")
         return
+    dest1 = obj['link1']['name']
+    cost1 = obj['link1']['cost']
+    next_hop1 = obj['link1']['name']
+    
+    dest2 = obj['link2']['name']
+    cost2 = obj['link2']['cost']
+    next_hop2 = obj['link2']['name']
+
     print('>>>> ' + obj['node']['name'] + ' routing table <<<<')
     print('-------------------------------------------------------')
     print('|   destination   |    link cost    |    next hop     |')
-    print('|    %-13s|    %-13s|    %-13s|' % (obj['link1']['name'],obj['link1']['cost'],obj['link1']['name']))
-    print('|    %-13s|    %-13s|    %-13s|' % (obj['link2']['name'],obj['link2']['cost'],obj['link2']['name']))
+    print('|    %-13s|    %-13s|    %-13s|' % (dest1,cost1,next_hop1))
+    print('|    %-13s|    %-13s|    %-13s|' % (dest2,cost2,next_hop2))
     print('-------------------------------------------------------')
 
 
@@ -44,7 +55,9 @@ def print_diff(obj1,obj2):
     else:
         print("Node " + obj1['node']['name'] + " routing table not changed")
 
-
+def save_table(table):
+    global node_configs
+    node_configs[table['node']['name']] = table
 
 def listen_thread(port):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -75,9 +88,9 @@ class RecvThread(threading.Thread):
             old = None
             if name in node_configs:
                 old = node_configs[name]
-            node_configs[name] = dict
+            save_table(dict)
             print_diff(old,dict)
-            print("Input command(load,send,bye):")
+            print("Input command(FirstLoad,FirstSend,Bye,MyRoutingTable,UpdateRouteCost):")
 
 class MyParser(configparser.ConfigParser):
     def as_dict(self):
@@ -131,7 +144,7 @@ def update_cost(node,cost):
             continue
         v = config_dict[k]
         tmp_name = v['name']
-        if tmp_name.lower() == name:
+        if tmp_name == name:
             v['cost'] = cost
             found = True
     if not found:
@@ -139,26 +152,24 @@ def update_cost(node,cost):
     else:
         send()
 while True:
-    print("Input command(load,send,bye,myroutingtable,update):")
-    text = sys.stdin.readline().strip().lower()
-    if text == "send":
+    print("Input command(FirstLoad,FirstSend,Bye,MyRoutingTable,UpdateRouteCost):")
+    text = sys.stdin.readline().strip()
+    if text == "FirstSend":
         send()
-    elif text == "load":
+    elif text == "FirstLoad":
         load(sys.argv[1])
-    elif text == "bye":
+    elif text == "Bye":
         break
-    elif text == "myroutingtable":
+    elif text == "MyRoutingTable":
         print_table(config_dict)
-    elif text.startswith("update"):
+    elif text.startswith("UpdateRouteCost"):
         cmds = text.split(" ")
         if len(cmds) != 3:
-            print("Update command usage:update <node name> <cost>")
+            print("Update command usage:UpdateRouteCost <node name> <cost>")
             continue
         name = cmds[1]
         cost = cmds[2]
         update_cost(name,cost)           
-    elif text == "print":
-        print_table(config_dict)
     else:
         print("Invalid command")
 

@@ -51,11 +51,25 @@ std::vector<std::string> split(const std::string &str, const std::string &delim)
 
 void print_table(routing_table table){
     printf(">>> %s Routing table<<<\n",table.name);
+    char* dest1 = table.node1.name;
+    int cost1 = table.node1.cost;
+    char* next_hop1 = table.node1.name;
+    
+    char* dest2 = table.node2.name;
+    int cost2 = table.node2.cost;
+    char* next_hop2 = table.node2.name;
+
     printf("-------------------------------------------------------\n");
     printf("|   destination   |    link cost    |    next hop     |\n");
-    printf("|    %-13s|    %-13d|    %-13s|\n",table.node1.name,table.node1.cost,table.node1.name);
-    printf("|    %-13s|    %-13d|    %-13s|\n",table.node2.name,table.node2.cost,table.node2.name);
+    printf("|    %-13s|    %-13d|    %-13s|\n",dest1,cost1,next_hop1);
+    printf("|    %-13s|    %-13d|    %-13s|\n",dest2,cost2,next_hop2);
     printf("-------------------------------------------------------\n");
+}
+
+void save_table(routing_table table)
+{
+    string name = string(table.name);
+    global_table_map[name] = table;
 }
 
 bool is_diff(routing_table table1,routing_table table2)
@@ -200,7 +214,7 @@ void* server_func(void* arg)
             routing_table old = global_table_map[name];
             print_diff(old,recv);
         }
-        global_table_map[name] = recv;
+        save_table(recv);
     }
 }
 
@@ -217,29 +231,29 @@ int main(int argc,char* argv[])
     int ret = pthread_create(&tid, NULL,server_func,&table);
     while(1)
     {
-        cout<<"Input command(load,send,bye,myroutingtable,update):"<<endl;
+        cout<<"Input command(FirstLoad,FirstSend,Bye,MyRoutingTable,UpdateRouteCost):"<<endl;
         string cmd;
         getline(cin,cmd);
-        if(cmd == "bye")
+        if(cmd == "Bye")
             break;
-        if(cmd == "send")
+        if(cmd == "FirstSend")
         {
             sendto(table.node1.ip,table.node1.port,table);
             sendto(table.node2.ip,table.node2.port,table);
             cout<<"Send routing table finished!"<<endl;
 
-        }else if(cmd == "myroutingtable")
+        }else if(cmd == "MyRoutingTable")
         {
             print_table(table);
-        }else if(cmd == "load")
+        }else if(cmd == "FirstLoad")
         {
             table = read(argv[1]);
             cout<<"Reload config finished!"<<endl;
-        }else if(cmd.find("update") == 0){
+        }else if(cmd.find("UpdateRouteCost") == 0){
             vector<string> cmds = split(cmd.c_str()," ");
             if(cmds.size() != 3)
             {
-                cout<<"Useage:update <node name> <cost>"<<endl;
+                cout<<"Useage:UpdateRouteCost <node name> <cost>"<<endl;
                 continue;
             }
             string name = cmds.at(1);
