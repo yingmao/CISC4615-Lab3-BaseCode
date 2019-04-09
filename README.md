@@ -50,7 +50,7 @@ Please study the sample code to understand the code style and logic of the sampl
 You can run the sample code as described below,
 
 - C++ Sample:
-	- Compile the code: g++ node.cpp -o node
+	- Compile the code: g++ node.cpp -o node OR g++ -pthread node.cpp -o node
 	- Run the code: ./node + config file
 	- Note that you should run the code three times with three different configuration files
 
