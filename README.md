@@ -1,7 +1,7 @@
-### CISC 4615 Project 1 base code
+### CISC 4615 Lab 3 base code
 
 In the Lab 1, we learned how to programming with sockets and TCP. In the lab 2, we learned
-how to work with UPD protocol and integrate CRC into the tranmissions. In this project 1, you
+how to work with UPD protocol and integrate CRC into the tranmissions. In this Lab 3, you
 will be constructing a virtual IP-based Network using UDP packets. Your network will support
 distance vector routing algorithm, in which you will observe ”good news travels fast” and ”bad
 news travels slow” (the example we studied in the lecture).
@@ -31,7 +31,7 @@ distance vector routing protocol has the following features,
 1. Base assumption: Each router knows its own address and the cost to reach each of its
 directly connected neighbors.
 2. Bellman-Ford algorithm: Distributed route computation using only neighbor’s information
-3. Mitigating loops: Split horizon and posion reverse (omitted in this project)
+3. Mitigating loops: Split horizon and posion reverse (omitted in this Lab)
 
 The following figure shows the operation at each node in the network.
 
